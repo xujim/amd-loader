@@ -1,0 +1,32 @@
+{
+  "name": "amd-loader",
+  "version": "1.0.0",
+  "description": "A custom implementation of amd.js",
+  "main": "amd.js",
+  "scripts": {
+    "start": "./node_modules/karma/bin/karma start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creeperyang/amd-loader.git"
+  },
+  "keywords": [
+    "amd",
+    "amd.js",
+    "module"
+  ],
+  "author": "creeperyang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creeperyang/amd-loader/issues"
+  },
+  "homepage": "https://github.com/creeperyang/amd-loader#readme",
+  "devDependencies": {
+    "jquery": "^2.2.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.21",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-jasmine": "^0.3.7"
+  }
+}
