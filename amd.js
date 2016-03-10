@@ -133,7 +133,7 @@
     function id2Url(url, baseUrl) {
         url = fixPath(url);
         if (baseUrl) {
-            url = dirname(baseUrl) + url;
+            url = fixPath(dirname(baseUrl) + url);
         }
         if (CONFIG.urlArgs) {
             url += CONFIG.urlArgs;
