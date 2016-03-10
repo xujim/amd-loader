@@ -2,7 +2,7 @@ var allTestFiles = [];
 var TEST_REGEXP = /spec\.js$/i;
 
 var pathToModule = function(path) {
-    return path.replace(/\/base/, '').replace(/\.js$/, '');
+    return path.replace(/\.js$/, '');
 };
 
 Object.keys(window.__karma__.files).forEach(function(file) {

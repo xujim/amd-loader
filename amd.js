@@ -130,32 +130,15 @@
         return m ? m[0] : "./";
     }
 
-    function id2Url(id, baseUrl) {
-        // id = CONFIG.paths[id] || id;
-
-        id = fixPath(id);
-        id = fixPath(dirname(baseUrl) + id);
-        id = id + (CONFIG.urlArgs || '');
-        return id;
-    }
-
-    var rUrl = /\//; // /^\.{0,2}\//;
-    function getValidDeps(deps) {
-        var validDeps = [], shim;
-        each(deps, function(d) {
-            shim = CONFIG.shim[d];
-            if (CONFIG.paths[d]) {
-                d = CONFIG.paths[d];
-            }
-            if (rUrl.test(d)) {
-                d = id2Url(d, CONFIG.baseUrl);
-            }
-            if (shim && !SHIMMAP[d]) {
-                SHIMMAP[d] = shim;
-            }
-            validDeps.push(d);
-        });
-        return validDeps;
+    function id2Url(url, baseUrl) {
+        url = fixPath(url);
+        if (baseUrl) {
+            url = dirname(baseUrl) + url;
+        }
+        if (CONFIG.urlArgs) {
+            url += CONFIG.urlArgs;
+        }
+        return url;
     }
 
     /**
@@ -239,17 +222,44 @@
         return interactiveScript;
     }
 
+    /// check deps and make it valid
+    /// Where do we need to check:
+    /// 1. Constructor
+    /// 2. Instance.save(deps)
+    var rUrl = /\//; // /^\.{0,2}\//;
+    var rAbsoluteUrl = /^\/|^https?:\/\//;
+    function getValidDeps(deps, baseUrl) {
+        var validDeps = [];
+        each(deps, function(d) {
+            validDeps.push(genValidUrl(d, dirname(baseUrl)));
+        });
+        return validDeps;
+    }
+    function genValidUrl(url, baseUrl) {
+        var shim = CONFIG.shim[url], inPaths;
+        if (CONFIG.paths[url]) {
+            url = CONFIG.paths[url];
+            inPaths = true;
+        }
+        if (rAbsoluteUrl.test(url)) {
+            url = id2Url(url); // prevent use baseUrl
+        } else if (rUrl.test(url)) {
+            url = id2Url(url, inPaths ? CONFIG.baseUrl : baseUrl);
+        }
+        if (shim && !SHIMMAP[url]) {
+            SHIMMAP[url] = shim;
+        }
+        return url;
+    }
+
     function Module(url, deps) {
         this.url = url;
-        this.deps = deps || [];                 // dependencies (ids) list
-        this.dependencies = [];                 // dependencies instance list
-        this.refs = [];                         // ref/dependents list, when the module loaded, notify them
+        this.dependencies = [];                    // dependencies instance list
+        this.refs = [];                            // ref/dependents list, when the module loaded, notify them
+        this.deps = getValidDeps(deps || [], url); // dependencies (ids) list
 
         this.exports = {};
         this.status = Module.STATUS.INITIAL;
-
-        // check deps
-        
     }
 
     // status of module
@@ -315,6 +325,7 @@
          */
         resolve: function() {
             var mod = this;
+            // we must check deps here.
             each(mod.deps, function(url) {
                 var m = Module.get(url);
                 mod.dependencies.push(m);
@@ -479,7 +490,7 @@
             if (mod.status >= STATUS.SAVE) return mod;
 
             mod.status = STATUS.SAVE;
-
+            deps = getValidDeps(deps, this.url);
             each(deps, function(d) {
                 var exist = false;
                 each(mod.dependencies, function(d2) {
@@ -523,7 +534,7 @@
      */
     Module.use = function(ids, callback, id) {
         var url = id2Url(id, CONFIG.baseUrl);
-        var mod = Module.get(url, getValidDeps(isString(ids) ? [ids] : ids));
+        var mod = Module.get(url, isString(ids) ? [ids] : ids);
         mod.id = id;
         mod.factory = callback;
         // after prepare, really load the script/module
@@ -592,7 +603,7 @@
                 mod.id = id || url;
             }
             mod.factory = factory;
-            mod.save(getValidDeps(deps));
+            mod.save(deps);
             mod.load();
         } else {
             // anonymouse module, set anonymousMeta for MoudleInstance.onload execute

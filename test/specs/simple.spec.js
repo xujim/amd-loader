@@ -1,4 +1,4 @@
-define(['test/example-modules/app', 'jquery'], function (App, $) {
+define(['../example-modules/app', 'jquery'], function (App, $) {
     describe('when the app starts', function () {
         it('outputs \'Amd Test!\' in the target', function () {
             var target = $('body');

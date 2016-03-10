@@ -1,4 +1,4 @@
-define(['./test/example-modules/module-withdeps'], function (withdeps) {
+define(['../example-modules/module-withdeps'], function (withdeps) {
     describe('Standard AMD module', function () {
         it('should load dependency successfully.', function () {
             expect(withdeps.deps).toEqual(['this is module-nodeps.', {
