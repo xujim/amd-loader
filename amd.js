@@ -34,7 +34,7 @@
     var head = document.head;
     var baseElement = document.getElementsByTagName('base')[0];
     //currentlyAddingScript表示正在添加到script中的
-    //TODO: interactiveScript是什么意思？
+    //NOTE: interactiveScript是什么意思？表示当前执行的script
     var currentlyAddingScript, interactiveScript, anonymousMeta;
 
     // utils
@@ -97,7 +97,7 @@
     function getGlobal(path) {
         if (!path) return path;
 
-        var g = root;//TODO:root是外部function传入，一般是什么值？
+        var g = root;//NOTE:root是外部function传入，一般是什么值？就是this
         each(path.split('.'), function(part) {
             g = (g != null) && g[part];
         });
@@ -213,7 +213,7 @@
             // ensure only execute once
             node.onload = node.onerror = node.onreadystatechange = null;
             // remove node
-            head.removeChild(node);//TODO:这里无法理解，为何要remove呢？
+            head.removeChild(node);//NOTE:这里无法理解，为何要remove呢？应该是为了保证只执行一次吧。如果还在head中页面重新加载就可能再次执行
             node = null;
             callback(error);
         }
@@ -302,7 +302,7 @@
         this.refs = [];                            // ref/dependents list, when the module loaded, notify them
         this.deps = getValidDeps(deps || [], url); // dependencies (ids) list
 
-        this.exports = {};//TODO:exports一般用来干嘛的？
+        this.exports = {};//NOTE:exports一般用来干嘛的？当前模块的执行需要依赖于其deps的export。main函数的执行需要其依赖的dep的exports
         this.status = Module.STATUS.INITIAL;//初始状态
     }
 
@@ -331,7 +331,7 @@
 // 加载mod相关的deps，并各自生成完整的mod对象
         load: function() {
             var mod = this;
-            var args = [];//TODO:存储了什么？
+            var args = [];//NOTE:存储了什么？存储了其依赖的deps的exports
 
             if (mod.status >= STATUS.LOAD) return mod;
 
@@ -350,7 +350,7 @@
                 } else if (dep.status === STATUS.SAVE) {
                     dep.load();
                 } else if (dep.status >= STATUS.EXECUTED) {
-                    args.push(dep.exports);//TODO:args用来干嘛？
+                    args.push(dep.exports);//NOTE:args用来干嘛？exports
                 }
             });
 
@@ -497,7 +497,7 @@
             var mod = this;
             var shim, shimDeps;
 
-// TODO:失败后的处理。mod.exports = undefined会有何影响呢？
+// NOTE:失败后的处理。mod.exports = undefined会有何影响呢？表示流程终端
             if (error) {
                 mod.exports = undefined;
                 mod.status = STATUS.ERROR;
@@ -515,7 +515,7 @@
                 ///
                 ///
                 mod.save(shimDeps);//将shimDeps保存至mod.dependencies中
-                // TODO:factory是用来干嘛的?
+                // NOTE:factory是用来干嘛的?当前模块的执行代码，构建了自己的export，在makeExports函数中执行
                 // 整个流程其实就是加载主模块（data-main指定的模块，里面有require调用），
                 // 然后加载require的依赖模块，当所有的模块及其依赖模块都已加载完毕，执行require调用中的factory方法。
                 mod.factory = function() {
@@ -593,7 +593,7 @@
         var url = id2Url(id, CONFIG.baseUrl);
         var mod = Module.get(url, isString(ids) ? [ids] : ids);//构建当前module（url是模块的url，ids是其deps）
         mod.id = id;
-        mod.factory = callback;//TODO:factory在何时会被使用呢？
+        mod.factory = callback;//NOTE:factory在何时会被使用呢？在makeExports中调用
         // after prepare, really load the script/module
         mod.load();
     };
