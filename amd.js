@@ -350,7 +350,7 @@
                 } else if (dep.status === STATUS.SAVE) {
                     dep.load();
                 } else if (dep.status >= STATUS.EXECUTED) {
-                    args.push(dep.exports);
+                    args.push(dep.exports);//TODO:args用来干嘛？
                 }
             });
 
@@ -359,7 +359,7 @@
             // means load all dependencies
             if (args.length === mod.dependencies.length) {
                 args.push(mod.exports);
-                mod.makeExports(args);
+                mod.makeExports(args);//makeExports将module的函数执行一遍，如此导出了module中exports的对象
                 mod.status = STATUS.EXECUTED;
                 // the current module is ready, notify its dependents (other module depend on the module)
                 mod.notifyDependents();
@@ -463,7 +463,7 @@
                 });
 
                 if (args.length === ref.dependencies.length) {
-                    args.push(ref.exports);
+                    args.push(ref.exports);//将exports的对象作为ref的callback（factory）回调的参数
                     ref.makeExports(args);
                     ref.status = STATUS.EXECUTED;
                     ref.notifyDependents();
@@ -696,6 +696,7 @@ require()异步加载moduleA，moduleB和moduleC，浏览器不会失去响应�
 　　　　// some code here
 　　});
      */
+    //  callback就是factory，会在makeExports函数中通过apply来调用
     var require = function(ids, callback) {
         if (isString(ids)) {
             makeError('Invalid', 'ids can\'t be string');
