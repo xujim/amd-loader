@@ -710,6 +710,7 @@ require()异步加载moduleA，moduleB和moduleC，浏览器不会失去响应�
         Module.use(ids, callback, Module.guid());
     };
 
+// NOTE:这个函数在何处被调用？在main中被执行，见test-main.js
     require.config = function(config) {
         if (!config) return;
         // ensure baseUrl end with slash
