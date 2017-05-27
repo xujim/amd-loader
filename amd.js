@@ -440,6 +440,7 @@
          * generate exports for the module
          *
          * @param  {Array} args arguments for module's factory (dependencies' exports and the module's own exports)
+         args是当前mod依赖的mods以及自己的exports。因为当前mod的callback(factory)的执行需要依赖于其依赖mod的执行完毕后才能执行自己的factory
          */
         makeExports: function(args) {
             var mod = this;
